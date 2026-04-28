@@ -1,0 +1,14 @@
+{{#each successMessages}}
+  <div class="alert alert-success alert-dismissible d-flex align-items-center gap-2 mb-3" role="alert">
+    <i class="fas fa-check-circle"></i>
+    <div>{{this}}</div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+{{/each}}
+{{#each errorMessages}}
+  <div class="alert alert-danger alert-dismissible d-flex align-items-center gap-2 mb-3" role="alert">
+    <i class="fas fa-exclamation-circle"></i>
+    <div>{{this}}</div>
+    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+  </div>
+{{/each}}

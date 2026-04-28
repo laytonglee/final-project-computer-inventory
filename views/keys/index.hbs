@@ -1,0 +1,118 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="fas fa-key me-2 text-warning"></i>API Key Management</h4>
+</div>
+
+{{!-- Show newly-generated key ONCE --}}
+{{#if newKey}}
+<div class="alert alert-warning border border-warning shadow-sm mb-4" role="alert">
+  <div class="d-flex align-items-start gap-3">
+    <i class="fas fa-exclamation-triangle fa-lg mt-1 text-warning"></i>
+    <div class="flex-grow-1">
+      <h6 class="alert-heading mb-1">New API Key Generated – Copy Now!</h6>
+      <p class="mb-2 small">This key will <strong>never be shown again</strong>. Store it securely.</p>
+      <div class="bg-dark text-success font-monospace p-2 rounded d-flex align-items-center gap-2" id="rawKeyBox">
+        <code id="rawKeyText" class="flex-grow-1 text-break" style="font-size:.85rem;">{{newKey.rawKey}}</code>
+        <button type="button" class="btn btn-sm btn-outline-light" onclick="copyKey()">
+          <i class="fas fa-copy"></i>
+        </button>
+      </div>
+      <small class="text-muted">Name: <strong>{{newKey.name}}</strong></small>
+    </div>
+  </div>
+</div>
+{{/if}}
+
+<div class="row g-4">
+  <!-- Generate Key Form -->
+  <div class="col-md-4">
+    <div class="card border-0 shadow-sm h-100">
+      <div class="card-header bg-white border-bottom">
+        <h6 class="mb-0 fw-semibold"><i class="fas fa-plus-circle me-2 text-primary"></i>Generate New Key</h6>
+      </div>
+      <div class="card-body">
+        <form method="POST" action="/keys">
+          <div class="mb-3">
+            <label class="form-label fw-semibold">Key Name / Purpose</label>
+            <input type="text" name="name" class="form-control" required
+                   placeholder="e.g. Monitoring Service, ERP Integration">
+            <div class="form-text">Descriptive name to identify this integration.</div>
+          </div>
+          <button type="submit" class="btn btn-primary w-100">
+            <i class="fas fa-key me-2"></i>Generate API Key
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Keys Table -->
+  <div class="col-md-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-bottom">
+        <h6 class="mb-0 fw-semibold">
+          <i class="fas fa-list me-2 text-muted"></i>Active Keys
+          <span class="badge bg-secondary ms-1">{{keys.length}}</span>
+        </h6>
+      </div>
+      <div class="card-body p-0">
+        {{#if keys.length}}
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Name</th>
+                <th>Prefix</th>
+                <th>Status</th>
+                <th>Created By</th>
+                <th>Created</th>
+                <th class="text-end">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#each keys}}
+              <tr>
+                <td><strong>{{name}}</strong></td>
+                <td><code class="text-muted">{{prefix}}…</code></td>
+                <td>
+                  {{#if isActive}}
+                    <span class="badge bg-success">Active</span>
+                  {{else}}
+                    <span class="badge bg-danger">Revoked</span>
+                  {{/if}}
+                </td>
+                <td><small>{{createdBy.username}}</small></td>
+                <td><small class="text-muted">{{formatDate createdAt}}</small></td>
+                <td class="text-end">
+                  <form method="POST" action="/keys/{{_id}}/revoke"
+                        onsubmit="return confirm('Revoke key \"{{name}}\"? All integrations using it will stop working.')">
+                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                      <i class="fas fa-trash me-1"></i>Revoke
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {{/each}}
+            </tbody>
+          </table>
+        </div>
+        {{else}}
+        <div class="text-center py-5 text-muted">
+          <i class="fas fa-key fa-3x mb-3"></i>
+          <p class="mb-0">No API keys yet. Generate one to get started.</p>
+        </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyKey() {
+  const text = document.getElementById('rawKeyText').textContent.trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('#rawKeyBox button');
+    btn.innerHTML = '<i class="fas fa-check"></i>';
+    setTimeout(() => btn.innerHTML = '<i class="fas fa-copy"></i>', 2000);
+  });
+}
+</script>

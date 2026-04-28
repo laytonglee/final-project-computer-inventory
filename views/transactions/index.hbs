@@ -1,0 +1,214 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="fas fa-exchange-alt me-2 text-primary"></i>Check In / Check Out</h4>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="txTabs">
+  <li class="nav-item">
+    <button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#checkout-tab">
+      <i class="fas fa-arrow-right-from-bracket me-2"></i>Check Out
+    </button>
+  </li>
+  <li class="nav-item">
+    <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#checkin-tab">
+      <i class="fas fa-arrow-right-to-bracket me-2"></i>Check In
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <!-- Check Out -->
+  <div class="tab-pane fade show active" id="checkout-tab">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom">
+            <h6 class="mb-0 fw-semibold text-primary">
+              <i class="fas fa-arrow-right-from-bracket me-2"></i>Assign Item to User
+            </h6>
+          </div>
+          <div class="card-body">
+            <form method="POST" action="/transactions/checkout" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Item <span class="text-danger">*</span></label>
+                <select name="itemId" class="form-select" required>
+                  <option value="">Select available item...</option>
+                  {{#each availableItems}}
+                  <option value="{{_id}}">{{itemId}} – {{brand}} {{model}}</option>
+                  {{/each}}
+                </select>
+                {{#unless availableItems.length}}
+                <div class="form-text text-danger">No items currently available.</div>
+                {{/unless}}
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Assign To <span class="text-danger">*</span></label>
+                <select name="assignedToId" class="form-select" required>
+                  <option value="">Select user...</option>
+                  {{#each users}}
+                  <option value="{{_id}}">{{username}}</option>
+                  {{/each}}
+                </select>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Reference Document</label>
+                <input type="file" name="document" class="form-control"
+                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                <div class="form-text">PDF, DOC, DOCX, or image. Max 10 MB.</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Notes</label>
+                <textarea name="notes" class="form-control" rows="2"
+                          placeholder="Optional checkout notes..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary w-100">
+                <i class="fas fa-arrow-right-from-bracket me-2"></i>Check Out Item
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- In-Use Quick View -->
+      <div class="col-lg-7">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-header bg-white border-bottom">
+            <h6 class="mb-0 fw-semibold text-muted">Currently Checked Out</h6>
+          </div>
+          <div class="card-body p-0">
+            {{#if inUseItems.length}}
+            <div class="table-responsive">
+              <table class="table table-sm table-hover align-middle mb-0">
+                <thead class="table-light">
+                  <tr><th>Item</th><th>Assigned To</th></tr>
+                </thead>
+                <tbody>
+                  {{#each inUseItems}}
+                  <tr>
+                    <td>
+                      <a href="/items/{{_id}}/history" class="fw-semibold text-decoration-none">{{itemId}}</a>
+                      <small class="text-muted d-block">{{brand}} {{model}}</small>
+                    </td>
+                    <td>{{#if assignedTo}}{{assignedTo.username}}{{else}}<span class="text-muted">—</span>{{/if}}</td>
+                  </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+            {{else}}
+            <div class="text-center py-4 text-muted">
+              <p class="mb-0 small">No items currently checked out.</p>
+            </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Check In -->
+  <div class="tab-pane fade" id="checkin-tab">
+    <div class="row g-4">
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom">
+            <h6 class="mb-0 fw-semibold text-success">
+              <i class="fas fa-arrow-right-to-bracket me-2"></i>Return Item
+            </h6>
+          </div>
+          <div class="card-body">
+            <form method="POST" action="/transactions/checkin" enctype="multipart/form-data">
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Item to Return <span class="text-danger">*</span></label>
+                <select name="itemId" class="form-select" required>
+                  <option value="">Select checked-out item...</option>
+                  {{#each inUseItems}}
+                  <option value="{{_id}}">
+                    {{itemId}} – {{brand}} {{model}}
+                    {{#if assignedTo}}({{assignedTo.username}}){{/if}}
+                  </option>
+                  {{/each}}
+                </select>
+                {{#unless inUseItems.length}}
+                <div class="form-text text-danger">No items currently checked out.</div>
+                {{/unless}}
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Inspection Document</label>
+                <input type="file" name="document" class="form-control"
+                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                <div class="form-text">Return inspection report. Max 10 MB.</div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Notes</label>
+                <textarea name="notes" class="form-control" rows="2"
+                          placeholder="Condition notes, damage report..."></textarea>
+              </div>
+              <button type="submit" class="btn btn-success w-100">
+                <i class="fas fa-arrow-right-to-bracket me-2"></i>Check In Item
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Transactions -->
+<div class="card border-0 shadow-sm mt-4">
+  <div class="card-header bg-white border-bottom">
+    <h6 class="mb-0 fw-semibold"><i class="fas fa-history me-2 text-muted"></i>Recent Transactions</h6>
+  </div>
+  <div class="card-body p-0">
+    {{#if recentTx.length}}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Item</th>
+            <th>Assigned To</th>
+            <th>Performed By</th>
+            <th>Document</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each recentTx}}
+          <tr>
+            <td><small class="text-muted">{{formatDateTime createdAt}}</small></td>
+            <td>
+              {{#if (eq type "checkout")}}
+                <span class="badge bg-primary">Check Out</span>
+              {{else}}
+                <span class="badge bg-success">Check In</span>
+              {{/if}}
+            </td>
+            <td>
+              <a href="/items/{{item._id}}/history" class="fw-semibold text-decoration-none">{{item.itemId}}</a>
+              <small class="text-muted d-block">{{item.model}}</small>
+            </td>
+            <td>{{#if assignedTo}}{{assignedTo.username}}{{else}}<span class="text-muted">—</span>{{/if}}</td>
+            <td>{{performedBy.username}}</td>
+            <td>
+              {{#if documentPath}}
+              <a href="/uploads/{{documentPath}}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                <i class="fas fa-file"></i>
+              </a>
+              {{else}}
+              <span class="text-muted">—</span>
+              {{/if}}
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{else}}
+    <div class="text-center py-4 text-muted">
+      <p class="mb-0">No transactions yet.</p>
+    </div>
+    {{/if}}
+  </div>
+</div>

@@ -1,0 +1,109 @@
+<div class="d-flex align-items-center gap-3 mb-4">
+  <a href="/items" class="btn btn-sm btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  <h4 class="fw-bold mb-0">
+    <i class="fas fa-history me-2 text-info"></i>Asset History
+  </h4>
+</div>
+
+<!-- Item Details Card -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-body">
+    <div class="row g-3 align-items-center">
+      <div class="col-auto">
+        <div class="rounded-circle bg-primary bg-opacity-10 d-flex align-items-center justify-content-center"
+             style="width:60px;height:60px;">
+          <i class="fas fa-desktop fa-2x text-primary"></i>
+        </div>
+      </div>
+      <div class="col">
+        <h5 class="mb-1 fw-bold">{{item.itemId}} – {{item.brand}} {{item.model}}</h5>
+        <div class="d-flex flex-wrap gap-3 text-muted small">
+          <span><i class="fas fa-tag me-1"></i>{{item.category}} · {{item.subtype}}</span>
+          {{#if item.serialNumber}}<span><i class="fas fa-barcode me-1"></i>{{item.serialNumber}}</span>{{/if}}
+          <span><i class="fas fa-calendar me-1"></i>Acquired {{formatDate item.dateAcquired}}</span>
+          <span>
+            <i class="fas fa-clock me-1"></i>
+            {{yearsAgo item.dateAcquired}} yr{{#if (gt (yearsAgo item.dateAcquired) 1)}}s{{/if}} old
+          </span>
+        </div>
+      </div>
+      <div class="col-auto">
+        <span class="badge bg-{{statusBadge item.status}} fs-6 px-3 py-2">{{item.status}}</span>
+        {{#if item.assignedTo}}
+        <div class="text-muted small mt-1 text-end">
+          <i class="fas fa-user me-1"></i>{{item.assignedTo.username}}
+        </div>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Transaction Timeline -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white border-bottom">
+    <h6 class="mb-0 fw-semibold"><i class="fas fa-list-ul me-2 text-muted"></i>Transaction Log
+      <span class="badge bg-secondary ms-1">{{history.length}}</span>
+    </h6>
+  </div>
+  <div class="card-body p-0">
+    {{#if history.length}}
+    <div class="timeline p-4">
+      {{#each history}}
+      <div class="timeline-item d-flex gap-3 mb-4">
+        <div class="timeline-icon flex-shrink-0">
+          {{#if (eq type "checkout")}}
+            <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                 style="width:36px;height:36px;"><i class="fas fa-arrow-up-from-bracket fa-sm"></i></div>
+          {{else}}
+            <div class="rounded-circle bg-success d-flex align-items-center justify-content-center text-white"
+                 style="width:36px;height:36px;"><i class="fas fa-arrow-down-to-bracket fa-sm"></i></div>
+          {{/if}}
+        </div>
+        <div class="flex-grow-1">
+          <div class="card border-0 bg-light">
+            <div class="card-body py-2 px-3">
+              <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+                <div>
+                  <span class="fw-semibold">
+                    {{#if (eq type "checkout")}}
+                      <span class="text-primary">Checked Out</span>
+                      {{#if assignedTo}}→ <strong>{{assignedTo.username}}</strong>{{/if}}
+                    {{else}}
+                      <span class="text-success">Checked In</span>
+                      {{#if assignedTo}}from <strong>{{assignedTo.username}}</strong>{{/if}}
+                    {{/if}}
+                  </span>
+                  <div class="text-muted small mt-1">
+                    Performed by <strong>{{performedBy.username}}</strong>
+                    on {{formatDateTime createdAt}}
+                  </div>
+                  {{#if notes}}
+                  <div class="mt-1 small text-muted fst-italic">"{{notes}}"</div>
+                  {{/if}}
+                </div>
+                {{#if documentPath}}
+                <a href="/uploads/{{documentPath}}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                  <i class="fas fa-file me-1"></i>{{#if documentOriginalName}}{{documentOriginalName}}{{else}}Document{{/if}}
+                </a>
+                {{/if}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+    {{else}}
+    <div class="text-center py-5 text-muted">
+      <i class="fas fa-inbox fa-3x mb-3"></i>
+      <p class="mb-0">No transaction history for this item.</p>
+      <a href="/transactions" class="btn btn-sm btn-primary mt-3">
+        <i class="fas fa-exchange-alt me-1"></i>Create Transaction
+      </a>
+    </div>
+    {{/if}}
+  </div>
+</div>

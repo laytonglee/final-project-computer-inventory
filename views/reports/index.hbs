@@ -1,0 +1,191 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="fas fa-chart-bar me-2 text-primary"></i>Reports</h4>
+</div>
+
+<!-- Inventory Status Summary -->
+<div class="row g-3 mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-bottom">
+        <h6 class="mb-0 fw-semibold"><i class="fas fa-boxes me-2 text-muted"></i>Inventory Status Summary</h6>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-3">
+            <div class="d-flex align-items-center gap-3 p-3 rounded bg-light">
+              <div class="rounded-circle bg-dark d-flex align-items-center justify-content-center text-white"
+                   style="width:44px;height:44px;"><i class="fas fa-boxes"></i></div>
+              <div>
+                <div class="h4 mb-0 fw-bold">{{totalItems}}</div>
+                <small class="text-muted">Total Assets</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="d-flex align-items-center gap-3 p-3 rounded bg-success bg-opacity-10">
+              <div class="rounded-circle bg-success d-flex align-items-center justify-content-center text-white"
+                   style="width:44px;height:44px;"><i class="fas fa-check"></i></div>
+              <div>
+                <div class="h4 mb-0 fw-bold text-success">{{statusAvailable}}</div>
+                <small class="text-muted">Available</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="d-flex align-items-center gap-3 p-3 rounded bg-primary bg-opacity-10">
+              <div class="rounded-circle bg-primary d-flex align-items-center justify-content-center text-white"
+                   style="width:44px;height:44px;"><i class="fas fa-user-check"></i></div>
+              <div>
+                <div class="h4 mb-0 fw-bold text-primary">{{statusInUse}}</div>
+                <small class="text-muted">In-Use</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="d-flex align-items-center gap-3 p-3 rounded bg-warning bg-opacity-10">
+              <div class="rounded-circle bg-warning d-flex align-items-center justify-content-center text-white"
+                   style="width:44px;height:44px;"><i class="fas fa-tools"></i></div>
+              <div>
+                <div class="h4 mb-0 fw-bold text-warning">{{statusMaintenance}}</div>
+                <small class="text-muted">Maintenance</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-2">
+            <div class="d-flex align-items-center gap-3 p-3 rounded bg-secondary bg-opacity-10">
+              <div class="rounded-circle bg-secondary d-flex align-items-center justify-content-center text-white"
+                   style="width:44px;height:44px;"><i class="fas fa-archive"></i></div>
+              <div>
+                <div class="h4 mb-0 fw-bold text-secondary">{{statusRetired}}</div>
+                <small class="text-muted">Retired</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Asset Aging Report -->
+<div class="card border-0 shadow-sm mb-4">
+  <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
+    <h6 class="mb-0 fw-semibold">
+      <i class="fas fa-hourglass-end me-2 text-warning"></i>Asset Aging Report
+      <span class="badge bg-warning text-dark ms-1">{{agingItems.length}} items &gt;3 years old</span>
+    </h6>
+  </div>
+  <div class="card-body p-0">
+    {{#if agingItems.length}}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Item ID</th>
+            <th>Brand / Model</th>
+            <th>Category</th>
+            <th>Date Acquired</th>
+            <th>Age</th>
+            <th>Status</th>
+            <th>Assigned To</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each agingItems}}
+          <tr>
+            <td>
+              <a href="/items/{{_id}}/history" class="fw-semibold text-decoration-none">
+                <code>{{itemId}}</code>
+              </a>
+            </td>
+            <td>{{brand}} {{model}}</td>
+            <td><small class="badge bg-light text-dark border">{{subtype}}</small></td>
+            <td>{{formatDate dateAcquired}}</td>
+            <td>
+              <span class="text-warning fw-semibold">
+                {{yearsAgo dateAcquired}} yrs
+              </span>
+            </td>
+            <td><span class="badge bg-{{statusBadge status}}">{{status}}</span></td>
+            <td>{{#if assignedTo}}{{assignedTo.username}}{{else}}<span class="text-muted">—</span>{{/if}}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{else}}
+    <div class="text-center py-4 text-muted">
+      <i class="fas fa-check-circle fa-2x mb-2 text-success"></i>
+      <p class="mb-0">No assets older than 3 years.</p>
+    </div>
+    {{/if}}
+  </div>
+</div>
+
+<!-- User Asset Audit -->
+<div class="card border-0 shadow-sm">
+  <div class="card-header bg-white border-bottom">
+    <h6 class="mb-0 fw-semibold"><i class="fas fa-user-shield me-2 text-info"></i>User Asset Audit</h6>
+  </div>
+  <div class="card-body">
+    <form method="GET" action="/reports" class="d-flex gap-2 mb-4">
+      <select name="userId" class="form-select" style="max-width:300px;" required>
+        <option value="">Select a user to audit...</option>
+        {{#each users}}
+        <option value="{{_id}}" {{#if (eq ../selectedUserId (toString _id))}}selected{{/if}}>
+          {{username}} ({{email}})
+        </option>
+        {{/each}}
+      </select>
+      <button type="submit" class="btn btn-info text-white">
+        <i class="fas fa-search me-1"></i>Audit
+      </button>
+      {{#if selectedUserId}}
+      <a href="/reports" class="btn btn-outline-secondary">Clear</a>
+      {{/if}}
+    </form>
+
+    {{#if auditUser}}
+    <div class="alert alert-info d-flex align-items-center gap-2 py-2">
+      <i class="fas fa-user-circle"></i>
+      <strong>{{auditUser.username}}</strong> currently has
+      <strong>{{userAssets.length}}</strong> item(s) checked out.
+    </div>
+
+    {{#if userAssets.length}}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead class="table-light">
+          <tr>
+            <th>Item ID</th>
+            <th>Brand / Model</th>
+            <th>Category</th>
+            <th>Serial #</th>
+            <th>Date Acquired</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each userAssets}}
+          <tr>
+            <td><a href="/items/{{_id}}/history" class="fw-semibold text-decoration-none"><code>{{itemId}}</code></a></td>
+            <td>{{brand}} {{model}}</td>
+            <td><small class="badge bg-light text-dark border">{{subtype}}</small></td>
+            <td><small class="text-muted font-monospace">{{#if serialNumber}}{{serialNumber}}{{else}}—{{/if}}</small></td>
+            <td>{{formatDate dateAcquired}}</td>
+            <td>
+              <a href="/items/{{_id}}/history" class="btn btn-sm btn-outline-info">
+                <i class="fas fa-history me-1"></i>History
+              </a>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{else}}
+    <p class="text-muted">This user has no assets currently assigned.</p>
+    {{/if}}
+    {{/if}}
+  </div>
+</div>

@@ -1,0 +1,77 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h4 class="fw-bold mb-0"><i class="fas fa-users me-2 text-primary"></i>User Management</h4>
+  <a href="/users/new" class="btn btn-primary">
+    <i class="fas fa-user-plus me-1"></i> Add User
+  </a>
+</div>
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body p-0">
+    {{#if users.length}}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Role</th>
+            <th>Status</th>
+            <th>Created</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each users}}
+          <tr class="{{#unless isActive}}table-secondary text-muted{{/unless}}">
+            <td>
+              <i class="fas fa-user-circle me-2 text-muted"></i>
+              <strong>{{username}}</strong>
+            </td>
+            <td>{{email}}</td>
+            <td>
+              <form method="POST" action="/users/{{_id}}/role" class="d-inline-flex align-items-center gap-1">
+                <select name="role" class="form-select form-select-sm" style="width:130px;"
+                        onchange="this.form.submit()">
+                  <option value="Admin"      {{#if (eq role "Admin")}}selected{{/if}}>Admin</option>
+                  <option value="Technician" {{#if (eq role "Technician")}}selected{{/if}}>Technician</option>
+                </select>
+              </form>
+            </td>
+            <td>
+              {{#if isActive}}
+                <span class="badge bg-success">Active</span>
+              {{else}}
+                <span class="badge bg-danger">Disabled</span>
+              {{/if}}
+            </td>
+            <td><small class="text-muted">{{formatDate createdAt}}</small></td>
+            <td class="text-end">
+              <form method="POST" action="/users/{{_id}}/status" class="d-inline">
+                {{#if isActive}}
+                  <input type="hidden" name="isActive" value="false">
+                  <button type="submit" class="btn btn-sm btn-outline-danger"
+                          title="Disable user"
+                          onclick="return confirm('Disable user {{username}}? Their API keys will also be revoked.')">
+                    <i class="fas fa-ban"></i>
+                  </button>
+                {{else}}
+                  <input type="hidden" name="isActive" value="true">
+                  <button type="submit" class="btn btn-sm btn-outline-success" title="Enable user">
+                    <i class="fas fa-check"></i>
+                  </button>
+                {{/if}}
+              </form>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+    {{else}}
+    <div class="text-center py-5 text-muted">
+      <i class="fas fa-users fa-3x mb-3"></i>
+      <p class="mb-0">No users found. <a href="/users/new">Create the first user.</a></p>
+    </div>
+    {{/if}}
+  </div>
+</div>
