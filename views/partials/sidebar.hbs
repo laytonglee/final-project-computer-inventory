@@ -1,0 +1,52 @@
+<aside class="sidebar sidebar-navy text-white d-flex flex-column" style="width:240px;min-height:calc(100vh - 56px);">
+  <nav class="flex-grow-1 py-3">
+    <ul class="nav flex-column px-2">
+      <li class="nav-item">
+        <a class="nav-link text-white-50 d-flex align-items-center gap-2" href="/dashboard">
+          <i class="fas fa-tachometer-alt fa-fw"></i> Dashboard
+        </a>
+      </li>
+
+      <li class="nav-section-label text-uppercase text-white-50 px-3 pt-3 pb-1" style="font-size:.65rem;letter-spacing:.08em;">Inventory</li>
+      <li class="nav-item">
+        <a class="nav-link text-white-50 d-flex align-items-center gap-2" href="/items">
+          <i class="fas fa-desktop fa-fw"></i> All Items
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white-50 d-flex align-items-center gap-2" href="/items/new">
+          <i class="fas fa-plus-circle fa-fw"></i> Add Item
+        </a>
+      </li>
+
+      <li class="nav-section-label text-uppercase text-white-50 px-3 pt-3 pb-1" style="font-size:.65rem;letter-spacing:.08em;">Operations</li>
+      <li class="nav-item">
+        <a class="nav-link text-white-50 d-flex align-items-center gap-2" href="/transactions">
+          <i class="fas fa-exchange-alt fa-fw"></i> Check In / Out
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white-50 d-flex align-items-center gap-2" href="/reports">
+          <i class="fas fa-chart-bar fa-fw"></i> Reports
+        </a>
+      </li>
+
+      {{#if (isAdmin currentUser.role)}}
+      <li class="nav-section-label text-uppercase text-white-50 px-3 pt-3 pb-1" style="font-size:.65rem;letter-spacing:.08em;">Admin</li>
+      <li class="nav-item">
+        <a class="nav-link text-white-50 d-flex align-items-center gap-2" href="/users">
+          <i class="fas fa-users fa-fw"></i> Users
+        </a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link text-white-50 d-flex align-items-center gap-2" href="/keys">
+          <i class="fas fa-key fa-fw"></i> API Keys
+        </a>
+      </li>
+      {{/if}}
+    </ul>
+  </nav>
+  <div class="p-3 border-top border-secondary">
+    <p class="text-white-50 mb-0" style="font-size:.7rem;">IT Inventory System v1.0</p>
+  </div>
+</aside>

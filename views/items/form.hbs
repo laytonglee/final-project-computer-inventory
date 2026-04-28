@@ -1,0 +1,132 @@
+<div class="d-flex align-items-center gap-3 mb-4">
+  <a href="/items" class="btn btn-sm btn-outline-secondary">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+  <h4 class="fw-bold mb-0">
+    {{#if isNew}}
+      <i class="fas fa-plus-circle me-2 text-primary"></i>Add New Item
+    {{else}}
+      <i class="fas fa-edit me-2 text-warning"></i>Edit Item
+      {{#if item.itemId}}<span class="text-muted fw-normal fs-5">– {{item.itemId}}</span>{{/if}}
+    {{/if}}
+  </h4>
+</div>
+
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-4">
+        <form method="POST" action="{{#if isNew}}/items{{else}}/items/{{item._id}}/edit{{/if}}" novalidate>
+
+          <div class="row g-3">
+            <!-- Brand & Model -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Brand <span class="text-danger">*</span></label>
+              <input type="text" name="brand" class="form-control"
+                     value="{{item.brand}}" required placeholder="e.g. Dell, HP, Lenovo">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Model <span class="text-danger">*</span></label>
+              <input type="text" name="model" class="form-control"
+                     value="{{item.model}}" required placeholder="e.g. Latitude 5540">
+            </div>
+
+            <!-- Category & Subtype -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+              <select name="category" id="categorySelect" class="form-select" required>
+                <option value="">Select category...</option>
+                <option value="Computer"   {{#if (eq item.category "Computer")}}selected{{/if}}>Computer</option>
+                <option value="Peripheral" {{#if (eq item.category "Peripheral")}}selected{{/if}}>Peripheral</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Subtype <span class="text-danger">*</span></label>
+              <select name="subtype" id="subtypeSelect" class="form-select" required>
+                <option value="">Select subtype...</option>
+                <!-- Computer subtypes -->
+                <option value="Laptop"   class="opt-computer" {{#if (eq item.subtype "Laptop")}}selected{{/if}}>Laptop</option>
+                <option value="Desktop"  class="opt-computer" {{#if (eq item.subtype "Desktop")}}selected{{/if}}>Desktop</option>
+                <option value="Server"   class="opt-computer" {{#if (eq item.subtype "Server")}}selected{{/if}}>Server</option>
+                <!-- Peripheral subtypes -->
+                <option value="Monitor"  class="opt-peripheral" {{#if (eq item.subtype "Monitor")}}selected{{/if}}>Monitor</option>
+                <option value="Keyboard" class="opt-peripheral" {{#if (eq item.subtype "Keyboard")}}selected{{/if}}>Keyboard</option>
+                <option value="Mouse"    class="opt-peripheral" {{#if (eq item.subtype "Mouse")}}selected{{/if}}>Mouse</option>
+                <option value="Printer"  class="opt-peripheral" {{#if (eq item.subtype "Printer")}}selected{{/if}}>Printer</option>
+                <option value="Other"    {{#if (eq item.subtype "Other")}}selected{{/if}}>Other</option>
+              </select>
+            </div>
+
+            <!-- Serial Number -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Serial Number</label>
+              <input type="text" name="serialNumber" class="form-control font-monospace"
+                     value="{{item.serialNumber}}" placeholder="e.g. SN-ABC123456">
+            </div>
+
+            <!-- Status (edit only) -->
+            {{#unless isNew}}
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Status</label>
+              <select name="status" class="form-select">
+                <option value="Available"   {{#if (eq item.status "Available")}}selected{{/if}}>Available</option>
+                <option value="In-Use"      {{#if (eq item.status "In-Use")}}selected{{/if}}>In-Use</option>
+                <option value="Maintenance" {{#if (eq item.status "Maintenance")}}selected{{/if}}>Maintenance</option>
+                <option value="Retired"     {{#if (eq item.status "Retired")}}selected{{/if}}>Retired</option>
+              </select>
+            </div>
+            {{/unless}}
+
+            <!-- Date Acquired -->
+            <div class="col-md-6">
+              <label class="form-label fw-semibold">Date Acquired <span class="text-danger">*</span></label>
+              <input type="date" name="dateAcquired" class="form-control" required
+                     value="{{dateValue item.dateAcquired}}">
+            </div>
+
+            <!-- Notes -->
+            <div class="col-12">
+              <label class="form-label fw-semibold">Notes</label>
+              <textarea name="notes" class="form-control" rows="3"
+                        placeholder="Additional notes about this item...">{{item.notes}}</textarea>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2 mt-4">
+            <button type="submit" class="btn btn-primary px-4">
+              <i class="fas fa-save me-2"></i>{{#if isNew}}Create Item{{else}}Save Changes{{/if}}
+            </button>
+            <a href="/items" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Filter subtype options based on selected category
+  const categorySelect = document.getElementById('categorySelect');
+  const subtypeSelect  = document.getElementById('subtypeSelect');
+
+  function filterSubtypes() {
+    const cat = categorySelect.value;
+    Array.from(subtypeSelect.options).forEach(opt => {
+      if (!opt.value) return; // keep placeholder
+      const isComp = opt.classList.contains('opt-computer');
+      const isPeri = opt.classList.contains('opt-peripheral');
+      if (cat === 'Computer')   opt.hidden = isPeri;
+      else if (cat === 'Peripheral') opt.hidden = isComp;
+      else opt.hidden = false;
+    });
+  }
+
+  categorySelect.addEventListener('change', () => {
+    if (subtypeSelect.options[subtypeSelect.selectedIndex].hidden) {
+      subtypeSelect.value = '';
+    }
+    filterSubtypes();
+  });
+
+  filterSubtypes(); // init on load
+</script>
