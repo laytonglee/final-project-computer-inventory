@@ -10,6 +10,7 @@ const flash = require("connect-flash");
 const { engine } = require("express-handlebars");
 
 const app = express();
+app.set('trust proxy', 1); // required when running behind Render/nginx reverse proxy
 
 // ── Ensure required directories exist ─────────────────────────────────────────
 const logsDir = path.join(__dirname, "logs");
