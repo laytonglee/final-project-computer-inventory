@@ -351,10 +351,9 @@ router.post('/keys', requireRole('Admin'), async (req, res) => {
 
     await ApiKey.create({ name: name.trim(), keyHash, prefix, createdBy: req.user.id });
 
-    // Store raw key in session so it's shown ONCE on redirect
     req.session.newApiKey = { name: name.trim(), rawKey };
     req.flash('success', 'API key generated. Copy it now — it will not be shown again.');
-    res.redirect('/keys');
+    req.session.save(() => res.redirect('/keys'));
   } catch (err) {
     req.flash('error', 'Could not generate key.');
     res.redirect('/keys');
