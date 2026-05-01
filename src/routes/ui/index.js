@@ -355,7 +355,8 @@ router.post('/keys', requireRole('Admin'), async (req, res) => {
     req.flash('success', 'API key generated. Copy it now — it will not be shown again.');
     req.session.save(() => res.redirect('/keys'));
   } catch (err) {
-    req.flash('error', 'Could not generate key.');
+    console.error('[UI POST /keys]', err);
+    req.flash('error', 'Could not generate key: ' + err.message);
     res.redirect('/keys');
   }
 });
